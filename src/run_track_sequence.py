@@ -19,6 +19,9 @@ from src.preprocess import PreprocessConfig, preprocess_frame
 from src.detect import DetectConfig, detect_objects
 from src.classify import classify_detections
 from src.track import MultiObjectTracker, TrackConfig
+import time
+from src.performance import make_analyzer_for_assignment
+
 
 import cv2  # from opencv-python
 
