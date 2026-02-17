@@ -1,0 +1,36 @@
+paths:
+  dataset: "data/raw/dataset"
+  results: "results/videos"
+  assets: "assets/iu_logo.png"
+
+preprocess:
+  voxel_size: 0.10
+  nb_neighbors: 20
+  std_ratio: 2.0
+  ransac_distance_threshold: 0.15
+  ransac_n: 3
+  ransac_num_iterations: 200
+
+detect:
+  eps: 0.9
+  min_points: 20
+  min_cluster_size: 40
+
+track:
+  max_match_distance: 3.5
+  max_age: 8
+  min_hits: 2
+  ignore_background: true
+
+video:
+  fps: 10
+  frame_repeat: 2
+  width: 1280
+  height: 720
+  background_color: [0.02, 0.02, 0.05]
+  point_size: 2.0
+  max_frames: 51  # Set to -1 to process all frames
+
+branding:
+  text: "IU International University of Applied Sciences"
+  logo_scale: 0.70
