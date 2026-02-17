@@ -22,6 +22,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from collections import defaultdict, Counter
 from typing import Dict, List, Tuple, Optional, Any
+import json
+from pathlib import Path
+# import json
+# from pathlib import Path
+from typing import Any
+
 
 import numpy as np
 
@@ -111,6 +117,57 @@ class PerformanceAnalyzer:
         self._detections_per_frame: List[int] = []
         self._class_labels_per_frame: List[List[str]] = []
         self._tracks_per_frame: List[List[Any]] = []
+
+    def save_json(self, path: Path, report=None) -> None:
+        """
+        Save performance report as JSON file.
+        """
+        if report is None:
+            report = self.generate_performance_report()
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        data = self.to_dict(report)
+        path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+    def to_dict(self, report=None) -> dict:
+        """
+        Convert performance report to JSON-serializable dictionary.
+        """
+        if report is None:
+            report = self.generate_performance_report()
+
+        return {
+            "frames_processed": self.frame_count,
+            "processing": {
+                "avg_frame_time_ms": report.avg_frame_time_ms,
+                "processing_fps": report.processing_fps,
+            },
+            "detection": {
+                "total_detections": report.detection.total_detections,
+                "detections_per_frame": report.detection.detections_per_frame,
+            },
+            "classification": {
+                "total_classified": report.classification.total_classified,
+                "estimated_accuracy": report.classification.estimated_accuracy,
+                "accuracy_with_gt": report.classification.accuracy,
+                "class_distribution": report.classification.class_distribution,
+            },
+            "tracking": {
+                "total_tracks": report.tracking.total_tracks,
+                "average_track_length": report.tracking.average_track_length,
+                "persistent_tracks": report.tracking.persistent_tracks,
+                "short_lived_tracks": report.tracking.short_lived_tracks,
+                "persistence_ratio": report.tracking.persistence_ratio,
+                "mota_est": report.tracking.mota,
+                "motp_est": report.tracking.motp,
+            },
+            "theoretical": {
+                "classification_rate": report.theoretical_classification_rate,
+                "false_alarm_rate_per_hour": report.theoretical_false_alarm_rate_per_hour,
+                "meets_requirements": report.meets_requirements,
+            },
+        }
 
     # ---- helpers to read your objects safely ----
 
@@ -475,3 +532,56 @@ def make_analyzer_for_assignment() -> PerformanceAnalyzer:
     Factory with sane defaults for this assignment.
     """
     return PerformanceAnalyzer(assumed_sensor_fps=10.0, min_persistent_len=5)
+
+
+def to_dict(self, report: Optional[PerformanceReport] = None) -> Dict[str, Any]:
+    """
+    Convert report + key analyzer info to a JSON-serializable dict.
+    """
+    if report is None:
+        report = self.generate_performance_report()
+
+    return {
+        "frames_processed": self.frame_count,
+        "assumed_sensor_fps": self.assumed_sensor_fps,
+        "min_persistent_len": self.min_persistent_len,
+        "processing": {
+            "avg_frame_time_ms": report.avg_frame_time_ms,
+            "processing_fps": report.processing_fps,
+            },
+            "detection": {
+                "total_detections": report.detection.total_detections,
+                "detections_per_frame": report.detection.detections_per_frame,
+            },
+            "classification": {
+                "total_classified": report.classification.total_classified,
+                "estimated_accuracy": report.classification.estimated_accuracy,
+                "accuracy_with_gt": report.classification.accuracy,
+                "class_distribution": report.classification.class_distribution,
+            },
+            "tracking": {
+                "total_tracks": report.tracking.total_tracks,
+                "average_track_length": report.tracking.average_track_length,
+                "persistent_tracks": report.tracking.persistent_tracks,
+                "short_lived_tracks": report.tracking.short_lived_tracks,
+                "persistence_ratio": report.tracking.persistence_ratio,
+                "mota_est": report.tracking.mota,
+                "motp_est": report.tracking.motp,
+            },
+            "theoretical_targets": {
+                "classification_rate": report.theoretical_classification_rate,
+                "false_alarm_rate_per_hour": report.theoretical_false_alarm_rate_per_hour,
+                "meets_requirements": report.meets_requirements,
+            },
+        }
+    
+
+
+    # def save_json(self, path: Path, report: Optional[PerformanceReport] = None) -> None:
+    #     """
+    #     Save report to a JSON file.
+    #     """
+    #     path.parent.mkdir(parents=True, exist_ok=True)
+    #     data = self.to_dict(report)
+    #     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
